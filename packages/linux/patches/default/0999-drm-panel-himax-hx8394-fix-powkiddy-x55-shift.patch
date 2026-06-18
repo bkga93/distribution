@@ -1,0 +1,28 @@
+From: Screen Shift Fix <fix@powkiddy-x55.local>
+Date: Thu, 18 Jun 2026 12:00:00 +0700
+Subject: [PATCH] drm/panel: himax-hx8394: Fix 1px screen shift on Powkiddy X55
+
+Increasing hfront-porch by 1 pixel (from 44 to 45) compensates for
+the panel's internal 1px horizontal alignment offset.
+
+Signed-off-by: Powkiddy X55 User <fix@powkiddy-x55.local>
+---
+ drivers/gpu/drm/panel/panel-himax-hx8394.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/gpu/drm/panel/panel-himax-hx8394.c b/drivers/gpu/drm/panel/panel-himax-hx8394.c
+index aabbccdd..eeff0011 100644
+--- a/drivers/gpu/drm/panel/panel-himax-hx8394.c
++++ b/drivers/gpu/drm/panel/panel-himax-hx8394.c
+@@ -325,9 +325,9 @@ static int powkiddy_x55_init_sequence(struct hx8394 *ctx)
+ static const struct drm_display_mode powkiddy_x55_mode = {
+ 	.hdisplay	= 720,
+-	.hsync_start	= 720 + 44,
+-	.hsync_end	= 720 + 44 + 20,
+-	.htotal		= 720 + 44 + 20 + 20,
++	.hsync_start	= 720 + 45,
++	.hsync_end	= 720 + 45 + 20,
++	.htotal		= 720 + 45 + 20 + 20,
+ 	.vdisplay	= 1280,
+ 	.vsync_start	= 1280 + 12,
+ 	.vsync_end	= 1280 + 12 + 10,

@@ -24,7 +24,7 @@ jobs:
       - name: Install cross-compile tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y bc bison build-essential ccache cpio flex gcc-aarch64-linux-gnu git libelf-dev libncurses-dev libssl-dev lzop make python3 rsync xz-utils zstd
+          sudo apt-get install -y bc bison build-essential ccache cpio flex gcc-aarch64-linux-gnu git libelf-dev libncurses-dev libssl-dev lzop make python3 rsync xz-utils zstd pahole
 
       - name: Setup ccache
         uses: hendrikmuhs/ccache-action@v1.2
@@ -63,7 +63,17 @@ jobs:
         run: |
           export PATH="/usr/lib/ccache:$PATH"
           cd linux-src
-          make -j$(nproc) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- Image dtbs 2>&1 | tail -30
+          make -j$(nproc) \
+            ARCH=arm64 \
+            CROSS_COMPILE=aarch64-linux-gnu- \
+            Image dtbs \
+            2>&1 | tee /tmp/build.log; BUILD_EXIT=${PIPESTATUS[0]}
+          if [ $BUILD_EXIT -ne 0 ]; then
+            echo "=== BUILD ERRORS ==="
+            grep -E "error:|Error |undefined|cannot find|fatal:" /tmp/build.log | tail -50
+            echo "=== END ERRORS ==="
+            exit $BUILD_EXIT
+          fi
           ls -lh arch/arm64/boot/Image
 
       - name: Collect output
